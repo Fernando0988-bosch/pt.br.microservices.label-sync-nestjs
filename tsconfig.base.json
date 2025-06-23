@@ -1,0 +1,28 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@pt.br.microservices.label-sync-nestjs/auth": ["libs/auth/src/index.ts"],
+      "@pt.br.microservices.label-sync-nestjs/common": [
+        "libs/common/src/index.ts"
+      ],
+      "@pt.br.microservices.label-sync-nestjs/rabbitmq": [
+        "libs/rabbitmq/src/index.ts"
+      ]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

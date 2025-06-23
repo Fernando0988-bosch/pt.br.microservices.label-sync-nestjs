@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Production
+dist/
+build/
+
+# Misc
+coverage/
+.nx/
+.angular/

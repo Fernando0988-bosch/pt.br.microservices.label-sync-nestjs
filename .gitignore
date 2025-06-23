@@ -1,44 +1,529 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# ==================================
+# Compiled output and builds
+# ==================================
+dist/
+tmp/
+out-tsc/
+build/
+out/
+.output/
+.nuxt/
+.next/
+.svelte-kit/
+coverage/
+lib-cov/
+nyc_output/
+.grunt/
+bower_components/
 
-# compiled output
-dist
-tmp
-out-tsc
+# ==================================
+# Dependencies and package managers
+# ==================================
+node_modules/
+jspm_packages/
+web_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+.yarn-integrity
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp.*
 
-# dependencies
-node_modules
+# ==================================
+# Environment and configuration
+# ==================================
+.env
+.env.*
+!.env.example
+!.env.test.example
+!.env.sample
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.environment
+config.json
+config.local.json
+.config
 
-# IDEs and editors
-/.idea
+# ==================================
+# IDE and editors
+# ==================================
+# VSCode - allow settings but ignore user-specific files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
+.vscode/*.code-snippets
+# Ignore user-specific vscode files
+.vscode/settings.local.json
+.vscode/launch.local.json
+
+# IntelliJ IDEA / WebStorm / PHPStorm / PyCharm / etc.
+.idea/
+*.iml
+*.iws
+*.ipr
+.fleet/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Atom
+.atom/
+
+# Eclipse
 .project
 .classpath
 .c9/
 *.launch
 .settings/
-*.sublime-workspace
+.metadata/
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
 
-# System Files
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+\#*\#
+.\#*
+*~
+.#*
+
+# Nano
+*.save
+
+# ==================================
+# Operating Systems
+# ==================================
+# macOS
 .DS_Store
-Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+.DocumentRevisions-V100
+.fseventsd
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDouble
+.LSOverride
+Icon
 
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ==================================
+# Logs and debugging
+# ==================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+debug.log
+error.log
+combined.log
+access.log
+app.log
+server.log
+
+# ==================================
+# Runtime data
+# ==================================
+pids/
+*.pid
+*.seed
+*.pid.lock
+.lock-wscript
+lib-cov/
+coverage/
+.nyc_output/
+.grunt/
+.node_repl_history
+.npm/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.cache/
+.parcel-cache/
+.eslintcache
+
+# ==================================
+# Testing and coverage
+# ==================================
+coverage/
+.coverage
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+junit.xml
+test-results/
+jest-results/
+karma-results/
+.karma/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+test-report.html
+test-report.xml
+
+# ==================================
+# Security and certificates
+# ==================================
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+*.cer
+*.der
+*.jks
+*.keystore
+*.truststore
+ca-key.pem
+ca.pem
+ca.srl
+cert.pem
+key.pem
+server-cert.pem
+server-key.pem
+.rnd
+
+# ==================================
+# Databases
+# ==================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+*.mdb
+*.ldb
+dump.rdb
+*.rdb
+
+# ==================================
+# Archives and compressed files
+# ==================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.bz2
+*.xz
+*.tgz
+*.tbz2
+*.Z
+*.deb
+*.rpm
+*.pkg
+*.exe
+*.app
+
+# ==================================
+# Temporary files and backups
+# ==================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+\#*\#
+.#*
+*.autosave
+*.recover
+
+# ==================================
+# Cloud and deployment
+# ==================================
+# Docker
+.dockerignore
+.docker/
+docker-compose.override.yml
+.env.docker
+
+# Kubernetes
+*.kubeconfig
+.kube/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfplan
+
+# AWS
+.aws/
+
+# ==================================
+# Framework specific
+# ==================================
+# Nx
 .nx/cache
 .nx/workspace-data
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+.angular/
+.nx/installation
+
+# Angular
+/dist
+/tmp
+/out-tsc
+/bazel-out
+node_modules/
+npm-debug.log
+yarn-error.log
+.angular/cache
+
+# React
+.react/
+
+# Vue
+.vuepress/dist
+
+# Nuxt
+.nuxt
+dist
+
+# Gatsby
+.cache/
+public
+
+# Vuepress
+.vuepress/dist
+
+# Serverless
+.serverless/
+.serverless_nextjs/
+
+# ==================================
+# Language specific
+# ==================================
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+.grunt
+bower_components
+.lock-wscript
+build/Release
+.node_repl_history
+*.tgz
+.yarn-integrity
+.env
+.env.test
+.env.production
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.cache
+.parcel-cache
+.next
+out
+dist
+build
+.nuxt
+.vuepress/dist
+.serverless
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ==================================
+# Documentation and generated files
+# ==================================
+documentation/
+docs/
+.compodoc/
+.docusaurus/
+.astro/
+storybook-static/
+.storybook-static/
+.styleguidist/
+typedoc/
+jsdoc/
+.quarto/
+
+# ==================================
+# Monitoring and analytics
+# ==================================
+newrelic_agent.log
+.monitoring/
+.analytics/
+
+# ==================================
+# Specific to this project
+# ==================================
+.cursor/
+.github/instructions/
+tools/temp/
+scripts/temp/
+temp/
+.temp/
+
+# ==================================
+# Miscellaneous
+# ==================================
+.sass-cache/
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+*.orig
+*.rej
+.sln
+.suo
+.user
+*.userprefs
+*.pidb
+.ntvs*
+.njsproj
+.sln
+.sw?
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.sublime-workspace
+.history/
+*.log
+/.fleet
+.idea/
+dist/
+tmp/
+out-tsc/
+/bazel-out
+.svelte-kit
+.routify
+.vercel
+.netlify
+.surge
+.firebase/
+.firebaserc
+firebase.json
+firestore.rules
+firestore.indexes.json
+.clasp.json
+deployment_scripts/

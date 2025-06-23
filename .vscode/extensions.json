@@ -1,7 +1,11 @@
 {
   "recommendations": [
-    
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-json",
+    "bradlc.vscode-tailwindcss",
     "nrwl.angular-console",
-    "esbenp.prettier-vscode"
+    "ms-vscode.vscode-jest"
   ]
 }
