@@ -1,0 +1,60 @@
+# .github/workflows/ci.yml
+name: CI – Lint, Format, Test & Coverage
+
+on:
+  # Run for every PR and for pushes to main (keeps the main branch green).
+  pull_request:
+    branches: [main, develop]    # adjust if you use a different flow
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1 – Check out repository
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      # 2 – Set up Node and enable npm cache
+      - name: Set up Node 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      # 3 – Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 4 – Verify code formatting (Prettier)
+      - name: Prettier – verify formatting
+        run: npx nx format:check --all
+        # Alternative: npx prettier --check .
+
+      # 5 – Run ESLint
+      - name: ESLint – lint all projects
+        run: npm run lint:all
+
+      # 6 – Run unit / e2e tests with coverage
+      - name: Jest – run all tests with coverage
+        env:
+          # Lowers RAM usage on small runners; tweak as needed
+          NX_JEST_MAX_WORKERS: 3
+        run: npx nx run-many --target=test --all --parallel
+
+      # 7 – ( optional ) Upload coverage reports as artifacts
+      - name: Upload coverage reports
+        if: always()          # upload even if previous step fails (for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            coverage
+            coverage/*
+
