@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine # versão 4.x com UI e plugins :contentReference[oaicite:0]{index=0}
+    container_name: rabbitmq
+    restart: unless-stopped
+
+    environment:
+      # credenciais iniciais
+      RABBITMQ_DEFAULT_USER: it_services
+      RABBITMQ_DEFAULT_PASS: it_services_password
+      RABBITMQ_DEFAULT_VHOST: it_vhost
+
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # HTTP Management UI
+      - '15692:15692' # Prometheus metrics (rabbitmq_prometheus)
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+
+volumes:
+  rabbitmq_data:

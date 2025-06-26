@@ -27,7 +27,11 @@ module.exports = {
     '^.+\\.(t|j)s$': 'ts-jest'
   },
   moduleFileExtensions: ['js', 'json', 'ts'],
-  testRegex: '.*\\.spec\\.ts$',
+  // Usar apenas testMatch, remover testRegex para evitar conflito
+  testMatch: [
+    '**/src/**/*.(test|spec).ts',
+    '**/tests/**/*.(test|spec).ts'
+  ],
   rootDir: '.',
   testTimeout: 20000,
   globals: {
