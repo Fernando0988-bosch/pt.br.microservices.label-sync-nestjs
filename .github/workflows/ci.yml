@@ -4,7 +4,7 @@ name: CI – Lint, Format, Test & Coverage
 on:
   # Run for every PR and for pushes to main (keeps the main branch green).
   pull_request:
-    branches: [main, develop]    # adjust if you use a different flow
+    branches: [main, develop] # adjust if you use a different flow
   push:
     branches: [main]
 
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: 'npm'
 
       # 3 – Install dependencies
       - name: Install dependencies
@@ -50,11 +50,10 @@ jobs:
 
       # 7 – ( optional ) Upload coverage reports as artifacts
       - name: Upload coverage reports
-        if: always()          # upload even if previous step fails (for debugging)
+        if: always() # upload even if previous step fails (for debugging)
         uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: |
             coverage
             coverage/*
-

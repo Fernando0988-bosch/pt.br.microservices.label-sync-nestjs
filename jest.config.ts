@@ -6,6 +6,6 @@ export default {
     '<rootDir>/apps/sap-catalog-poller',
     '<rootDir>/libs/auth',
     '<rootDir>/libs/rabbitmq',
-    '<rootDir>/libs/common'
-  ]
+    '<rootDir>/libs/common',
+  ],
 };

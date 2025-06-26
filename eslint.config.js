@@ -18,8 +18,8 @@ module.exports = [
       '.nx/**',
       '.cache/**',
       '.parcel-cache/**',
-      'documentation/**'
-    ]
+      'documentation/**',
+    ],
   },
 
   // Configuração para arquivos TypeScript
@@ -30,11 +30,11 @@ module.exports = [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: null // Não usar projeto para evitar problemas
-      }
+        project: null, // Não usar projeto para evitar problemas
+      },
     },
     plugins: {
-      '@typescript-eslint': tsPlugin
+      '@typescript-eslint': tsPlugin,
     },
     rules: {
       // Desabilitar regras que podem causar problemas
@@ -42,8 +42,8 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
       'no-unused-vars': 'off',
       'no-undef': 'off',
-      'no-useless-escape': 'off'
-    }
+      'no-useless-escape': 'off',
+    },
   },
 
   // Configuração para arquivos JavaScript
@@ -61,13 +61,13 @@ module.exports = [
         global: 'readonly',
         module: 'readonly',
         require: 'readonly',
-        exports: 'readonly'
-      }
+        exports: 'readonly',
+      },
     },
     rules: {
       'no-unused-vars': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
 
   // Configuração para arquivos de teste
@@ -78,7 +78,7 @@ module.exports = [
       '**/*.test.ts',
       '**/*.test.js',
       '**/tests/**/*.ts',
-      '**/tests/**/*.js'
+      '**/tests/**/*.js',
     ],
     languageOptions: {
       parser: tsParser,
@@ -91,14 +91,14 @@ module.exports = [
         afterEach: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
-        jest: 'readonly'
-      }
+        jest: 'readonly',
+      },
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
       'no-unused-vars': 'off',
-      'no-undef': 'off'
-    }
+      'no-undef': 'off',
+    },
   },
 
   // Configuração para arquivos de configuração
@@ -108,16 +108,16 @@ module.exports = [
       'jest.config.js',
       '*.config.ts',
       '*.config.js',
-      'commitlint.config.js'
+      'commitlint.config.js',
     ],
     languageOptions: {
-      parser: tsParser
+      parser: tsParser,
     },
     rules: {
       'no-useless-escape': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'no-unused-vars': 'off',
-      'no-undef': 'off'
-    }
-  }
+      'no-undef': 'off',
+    },
+  },
 ];

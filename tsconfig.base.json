@@ -19,6 +19,9 @@
       "@pt.br.microservices.label-sync-nestjs/common": [
         "libs/common/src/index.ts"
       ],
+      "@pt.br.microservices.label-sync-nestjs/error-handling": [
+        "libs/error-handling/src/index.ts"
+      ],
       "@pt.br.microservices.label-sync-nestjs/rabbitmq": [
         "libs/rabbitmq/src/index.ts"
       ]

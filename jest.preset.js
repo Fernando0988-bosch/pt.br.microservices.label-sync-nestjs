@@ -12,31 +12,28 @@ module.exports = {
     '!src/**/*.constants.{js,ts}',
     '!src/**/index.{js,ts}',
     '!src/main.{js,ts}',
-    '!src/**/*.module.{js,ts}'
+    '!src/**/*.module.{js,ts}',
   ],
   coverageThreshold: {
     global: {
       branches: 90,
       functions: 90,
       lines: 90,
-      statements: 90
-    }
+      statements: 90,
+    },
   },
   testEnvironment: 'node',
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest'
+    '^.+\\.(t|j)s$': 'ts-jest',
   },
   moduleFileExtensions: ['js', 'json', 'ts'],
   // Usar apenas testMatch, remover testRegex para evitar conflito
-  testMatch: [
-    '**/src/**/*.(test|spec).ts',
-    '**/tests/**/*.(test|spec).ts'
-  ],
+  testMatch: ['**/src/**/*.(test|spec).ts', '**/tests/**/*.(test|spec).ts'],
   rootDir: '.',
   testTimeout: 20000,
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json'
-    }
-  }
+      tsconfig: '<rootDir>/tsconfig.spec.json',
+    },
+  },
 };

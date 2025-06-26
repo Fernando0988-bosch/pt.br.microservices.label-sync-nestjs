@@ -8,7 +8,12 @@
     "lint:fix": "eslint . --fix --max-warnings 0",
     "lint:all": "nx run-many --target=lint --all",
     "lint:affected": "nx affected:lint",
-    "lint:check": "eslint . --max-warnings 0 --dry-run"
+    "lint:check": "eslint . --max-warnings 0 --dry-run",
+    "prettier": "prettier --check . --ignore-unknown",
+    "prettier:fix": "prettier --write . --ignore-unknown",
+    "prettier:all": "nx format:write",
+    "prettier:affected": "nx affected:format",
+    "prettier:check": "nx format:check"
   },
   "private": true,
   "devDependencies": {

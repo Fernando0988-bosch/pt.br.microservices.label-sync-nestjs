@@ -7,10 +7,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/edge-broker',
-  testMatch: [
-    '<rootDir>/src/**/*.(test|spec).ts',
-    '<rootDir>/tests/**/*.(test|spec).ts'
-  ],
+  testMatch: ['<rootDir>/src/**/*.(test|spec).ts', '<rootDir>/tests/**/*.(test|spec).ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',
@@ -20,14 +17,14 @@ export default {
     '!src/**/*.constants.ts',
     '!src/**/index.ts',
     '!src/main.ts',
-    '!src/**/*.module.ts'
+    '!src/**/*.module.ts',
   ],
   coverageThreshold: {
     global: {
       branches: 90,
       functions: 90,
       lines: 90,
-      statements: 90
-    }
-  }
+      statements: 90,
+    },
+  },
 };

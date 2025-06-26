@@ -6,6 +6,7 @@
     "ms-vscode.vscode-json",
     "bradlc.vscode-tailwindcss",
     "nrwl.angular-console",
-    "ms-vscode.vscode-jest"
+    "ms-vscode.vscode-jest",
+    "firsttris.vscode-jest-runner"
   ]
 }
