@@ -1,1 +1,1 @@
-export const RabbitmqPublishers = {};
+export * from './publisher.service';

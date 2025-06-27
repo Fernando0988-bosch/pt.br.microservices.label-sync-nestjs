@@ -1,1 +1,1 @@
-export const RabbitmqConsumers = {};
+export * from './consumer.service';
