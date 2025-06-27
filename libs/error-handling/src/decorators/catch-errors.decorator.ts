@@ -18,14 +18,10 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
     defaultException = ExternalServiceException,
     ignoreErrors = [],
     onError,
-    fallbackValue = null
+    fallbackValue = null,
   } = options;
 
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const className = target.constructor.name;
     const methodName = String(propertyKey);
@@ -43,7 +39,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
         const result = await originalMethod.apply(this, args);
         return result;
       } catch (error: unknown) {
-        if (ignoreErrors.some(ErrorType => error instanceof ErrorType)) {
+        if (ignoreErrors.some((ErrorType) => error instanceof ErrorType)) {
           return fallbackValue;
         }
 
@@ -87,11 +83,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
 }
 
 export function RetryOnError(retries: number = 3, delay: number = 1000): MethodDecorator {
-  return function (
-    target: any,
-    propertyKey: string | symbol,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const logger = new Logger(`${target.constructor.name}.${String(propertyKey)}`);
 
@@ -110,7 +102,7 @@ export function RetryOnError(retries: number = 3, delay: number = 1000): MethodD
               errorCode: error.errorCode,
             });
 
-            await new Promise(resolve => setTimeout(resolve, delay * attempt));
+            await new Promise((resolve) => setTimeout(resolve, delay * attempt));
             continue;
           }
 

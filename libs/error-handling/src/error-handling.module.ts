@@ -14,10 +14,7 @@ export interface ErrorHandlingModuleOptions {
 @Module({})
 export class ErrorHandlingModule {
   static forRoot(options: ErrorHandlingModuleOptions = {}): DynamicModule {
-    const {
-      enableGlobalFilter = true,
-      enableErrorLogging = true
-    } = options;
+    const { enableGlobalFilter = true, enableErrorLogging = true } = options;
 
     const providers: any[] = [];
 

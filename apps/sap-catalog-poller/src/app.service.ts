@@ -3,7 +3,7 @@ import {
   NotFoundException,
   SapConnectionException,
   BusinessLogicException,
-  ExternalServiceException
+  ExternalServiceException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 import { CatchErrors, RetryOnError } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 
@@ -11,7 +11,7 @@ import { CatchErrors, RetryOnError } from '@pt.br.microservices.label-sync-nestj
 export class AppService {
   @CatchErrors({
     defaultException: ExternalServiceException,
-    logErrors: true
+    logErrors: true,
   })
   @RetryOnError(3, 1000)
   async getSapData(id: string) {

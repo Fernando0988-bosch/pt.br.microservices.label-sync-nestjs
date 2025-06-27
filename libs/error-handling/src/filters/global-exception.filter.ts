@@ -53,7 +53,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ...baseResponse,
         statusCode: status,
         errorCode: this.mapStatusToErrorCode(status),
-        message: typeof response === 'string' ? response : (response as any)?.message || exception.message,
+        message:
+          typeof response === 'string' ? response : (response as any)?.message || exception.message,
         details: typeof response === 'object' ? (response as any)?.details : undefined,
       };
     }
@@ -64,9 +65,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         ...baseResponse,
         statusCode: HttpStatus.BAD_GATEWAY,
         errorCode: ErrorCode.EXTERNAL_SERVICE_ERROR,
-        message: process.env['NODE_ENV'] === 'production' 
-          ? 'Erro de comunicação com serviço externo' 
-          : exception.message,
+        message:
+          process.env['NODE_ENV'] === 'production'
+            ? 'Erro de comunicação com serviço externo'
+            : exception.message,
         details: process.env['NODE_ENV'] === 'production' ? undefined : { stack: exception.stack },
       };
     }
@@ -81,9 +83,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   }
 
   private getCorrelationId(request: Request): string {
-    return request.headers['x-correlation-id'] as string ||
-      request.headers['x-request-id'] as string ||
-      this.generateCorrelationId();
+    return (
+      (request.headers['x-correlation-id'] as string) ||
+      (request.headers['x-request-id'] as string) ||
+      this.generateCorrelationId()
+    );
   }
 
   private generateCorrelationId(): string {
@@ -136,7 +140,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
     const sanitized = { ...headers };
 
-    sensitiveHeaders.forEach(header => {
+    sensitiveHeaders.forEach((header) => {
       if (sanitized[header]) {
         sanitized[header] = '[REDACTED]';
       }
@@ -151,7 +155,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const sensitiveFields = ['password', 'token', 'secret', 'key'];
     const sanitized = { ...body };
 
-    sensitiveFields.forEach(field => {
+    sensitiveFields.forEach((field) => {
       if (sanitized[field]) {
         sanitized[field] = '[REDACTED]';
       }

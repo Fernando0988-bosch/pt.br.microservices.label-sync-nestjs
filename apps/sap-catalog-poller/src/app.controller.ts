@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import {
   ValidationException,
-  BusinessLogicException
+  BusinessLogicException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 import { AppService } from './app.service';
 
@@ -17,11 +17,13 @@ export class AppController {
   @Get('sap/:id')
   async getSapData(@Param('id') id: string) {
     if (!id || id.length < 3) {
-      throw new ValidationException([{
-        field: 'id',
-        message: 'ID deve ter pelo menos 3 caracteres',
-        value: id
-      }]);
+      throw new ValidationException([
+        {
+          field: 'id',
+          message: 'ID deve ter pelo menos 3 caracteres',
+          value: id,
+        },
+      ]);
     }
 
     return this.appService.getSapData(id);

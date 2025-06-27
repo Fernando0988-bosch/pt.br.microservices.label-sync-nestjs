@@ -3,9 +3,10 @@ import { BaseException } from '../base';
 
 export class NotFoundException extends BaseException {
   constructor(resource?: string, identifier?: any) {
-    const message = resource && identifier
-      ? `${resource} com identificador ${identifier} não encontrado`
-      : undefined;
+    const message =
+      resource && identifier
+        ? `${resource} com identificador ${identifier} não encontrado`
+        : undefined;
 
     super({
       errorCode: ErrorCode.NOT_FOUND,

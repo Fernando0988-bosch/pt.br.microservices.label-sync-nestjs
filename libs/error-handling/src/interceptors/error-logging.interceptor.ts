@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
@@ -65,8 +59,9 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
   }
 
   private ensureCorrelationId(request: Request): string {
-    let correlationId = request.headers['x-correlation-id'] as string ||
-      request.headers['x-request-id'] as string;
+    let correlationId =
+      (request.headers['x-correlation-id'] as string) ||
+      (request.headers['x-request-id'] as string);
 
     if (!correlationId) {
       correlationId = this.generateCorrelationId();

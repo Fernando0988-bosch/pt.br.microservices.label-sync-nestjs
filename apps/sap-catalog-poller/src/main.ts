@@ -10,25 +10,25 @@ import { environment } from './environments/environment';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Configure global prefix
   app.setGlobalPrefix(environment.globalPrefix);
-  
+
   // Enable CORS for development
   if (!environment.production) {
     app.enableCors();
   }
-  
+
   // Start server
   await app.listen(environment.port);
-  
+
   Logger.log(
     `🚀 SAP Catalog Poller is running on: http://localhost:${environment.port}/${environment.globalPrefix}`,
-    'Bootstrap'
+    'Bootstrap',
   );
   Logger.log(
     `🌍 Environment: ${environment.production ? 'Production' : 'Development'}`,
-    'Bootstrap'
+    'Bootstrap',
   );
 }
 
