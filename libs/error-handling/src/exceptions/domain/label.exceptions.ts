@@ -17,7 +17,7 @@ export class PrintJobFailedException extends BaseException {
       errorCode: ErrorCode.PRINT_JOB_FAILED,
       message: `Trabalho de impressão ${jobId} falhou: ${reason}`,
       details: { jobId, reason },
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }

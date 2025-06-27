@@ -16,8 +16,8 @@ export class GatewayTimeoutException extends BaseException {
   constructor(message?: string, details?: unknown) {
     super({
       errorCode: ErrorCode.GATEWAY_TIMEOUT,
-      message,
-      details,
+      ...(message && { message }),
+      ...(details !== undefined && { details }),
       retryable: true,
     });
   }

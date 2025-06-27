@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ErrorCode, ErrorMessages, HttpStatusByErrorCode } from '../../constants';
 import { ExceptionMetadata } from '../../interfaces';
+import { ErrorContext } from '../../interfaces/error-response.interface';
 
 export abstract class BaseException extends HttpException {
   public readonly errorCode: ErrorCode;
   public readonly details?: unknown;
-  public readonly context?: Record<string, unknown>;
+  public readonly context?: ErrorContext;
   public override readonly cause: Error | undefined;
   public readonly retryable: boolean;
   public readonly timestamp: string;
@@ -26,12 +27,18 @@ export abstract class BaseException extends HttpException {
     super(response, statusCode, { cause: metadata.cause });
 
     this.errorCode = metadata.errorCode;
-    this.details = metadata.details;
-    this.context = metadata.context;
+    if (metadata.details !== undefined) {
+      this.details = metadata.details;
+    }
+    if (metadata.context !== undefined) {
+      this.context = metadata.context;
+    }
     this.cause = metadata.cause;
     this.retryable = metadata.retryable ?? false;
     this.timestamp = new Date().toISOString();
-    this.correlationId = metadata.context?.correlationId;
+    if (metadata.context?.correlationId !== undefined) {
+      this.correlationId = metadata.context.correlationId;
+    }
 
     if (metadata.cause?.stack) {
       this.stack = `${this.stack}\nCaused by: ${metadata.cause.stack}`;
@@ -55,7 +62,7 @@ export abstract class BaseException extends HttpException {
   }
 
   withContext(context: Record<string, unknown>): this {
-    (this as { context?: Record<string, unknown> }).context = { ...this.context, ...context };
+    (this as unknown as { context?: ErrorContext }).context = { ...this.context, ...context };
     return this;
   }
 }

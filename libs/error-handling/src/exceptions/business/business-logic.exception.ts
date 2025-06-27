@@ -6,7 +6,7 @@ export class BusinessLogicException extends BaseException {
     super({
       errorCode: ErrorCode.BUSINESS_RULE_VIOLATION,
       message,
-      details,
+      ...(details !== undefined && { details }),
     });
   }
 }

@@ -17,7 +17,7 @@ export class MessageProcessingException extends BaseException {
       errorCode: ErrorCode.MESSAGE_PROCESSING_ERROR,
       message: `Erro ao processar mensagem ${messageId} da fila ${queueName}`,
       details: { queueName, messageId },
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }
@@ -28,7 +28,7 @@ export class QueueConnectionException extends BaseException {
     super({
       errorCode: ErrorCode.QUEUE_CONNECTION_ERROR,
       message: 'Erro ao conectar com RabbitMQ',
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }

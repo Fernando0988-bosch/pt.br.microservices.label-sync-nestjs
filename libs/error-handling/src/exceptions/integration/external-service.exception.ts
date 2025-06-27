@@ -7,7 +7,7 @@ export class ExternalServiceException extends BaseException {
       errorCode: ErrorCode.EXTERNAL_SERVICE_ERROR,
       message: `Erro ao comunicar com serviço externo: ${service}`,
       details: { service },
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }
@@ -19,7 +19,7 @@ export class IntegrationException extends BaseException {
       errorCode: ErrorCode.INTEGRATION_ERROR,
       message: `Erro de integração com ${system} durante ${operation}`,
       details: { system, operation },
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }

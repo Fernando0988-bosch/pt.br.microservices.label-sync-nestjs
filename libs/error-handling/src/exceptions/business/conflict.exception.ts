@@ -6,7 +6,7 @@ export class ConflictException extends BaseException {
     super({
       errorCode: ErrorCode.CONFLICT,
       message,
-      details,
+      ...(details !== undefined && { details }),
     });
   }
 }

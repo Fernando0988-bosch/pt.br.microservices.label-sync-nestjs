@@ -6,7 +6,7 @@ export class SapConnectionException extends BaseException {
     super({
       errorCode: ErrorCode.SAP_CONNECTION_ERROR,
       message: 'Erro ao conectar com SAP',
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }
@@ -18,7 +18,7 @@ export class SapDataSyncException extends BaseException {
       errorCode: ErrorCode.SAP_DATA_SYNC_ERROR,
       message: `Erro ao sincronizar ${entity} com SAP durante ${operation}`,
       details: { entity, operation },
-      cause: error,
+      ...(error && { cause: error }),
       retryable: true,
     });
   }
@@ -29,7 +29,7 @@ export class SapAuthenticationException extends BaseException {
     super({
       errorCode: ErrorCode.SAP_AUTHENTICATION_ERROR,
       message: 'Falha na autenticação com SAP',
-      cause: error,
+      ...(error && { cause: error }),
     });
   }
 }

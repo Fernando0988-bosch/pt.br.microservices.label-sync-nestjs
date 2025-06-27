@@ -56,9 +56,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message:
           typeof response === 'string'
             ? response
-            : ((response as Record<string, unknown>)?.message ?? exception.message),
+            : ((response as Record<string, unknown>)?.['message'] ?? exception.message) as string,
         details:
-          typeof response === 'object' ? (response as Record<string, unknown>)?.details : undefined,
+          typeof response === 'object' ? (response as Record<string, unknown>)?.['details'] : undefined,
       };
     }
 
@@ -141,11 +141,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   private sanitizeHeaders(headers: unknown): unknown {
     const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
-    const sanitized = { ...headers };
+    const sanitized = { ...(headers as Record<string, unknown>) };
 
     sensitiveHeaders.forEach((header) => {
-      if (sanitized[header]) {
-        sanitized[header] = '[REDACTED]';
+      if ((sanitized as Record<string, unknown>)[header]) {
+        (sanitized as Record<string, unknown>)[header] = '[REDACTED]';
       }
     });
 
@@ -161,8 +161,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const sanitized = { ...body };
 
     sensitiveFields.forEach((field) => {
-      if (sanitized[field]) {
-        sanitized[field] = '[REDACTED]';
+      if ((sanitized as Record<string, unknown>)[field]) {
+        (sanitized as Record<string, unknown>)[field] = '[REDACTED]';
       }
     });
 

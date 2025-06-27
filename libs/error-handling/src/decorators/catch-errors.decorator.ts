@@ -21,7 +21,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
     fallbackValue = null,
   } = options;
 
-  return function (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+  return function (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const className = target.constructor.name;
     const methodName = String(propertyKey);
@@ -89,7 +89,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
 }
 
 export function RetryOnError(retries = 3, delay = 1000): MethodDecorator {
-  return function (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+  return function (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const logger = new Logger(`${target.constructor.name}.${String(propertyKey)}`);
 

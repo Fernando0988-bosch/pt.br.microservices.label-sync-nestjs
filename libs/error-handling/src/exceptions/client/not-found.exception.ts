@@ -10,7 +10,7 @@ export class NotFoundException extends BaseException {
 
     super({
       errorCode: ErrorCode.NOT_FOUND,
-      message,
+      ...(message && { message }),
       details: { resource, identifier },
     });
   }
