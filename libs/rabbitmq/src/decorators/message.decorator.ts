@@ -9,14 +9,14 @@ export const Message = createParamDecorator(
 );
 
 export const MessageData = createParamDecorator(
-  (data: string, ctx: ExecutionContext): any => {
+  (data: string, ctx: ExecutionContext): unknown => {
     const message = ctx.switchToRpc().getData();
     return data ? message?.data?.[data] : message?.data;
   }
 );
 
 export const MessageHeaders = createParamDecorator(
-  (data: string, ctx: ExecutionContext): Record<string, any> => {
+  (data: string, ctx: ExecutionContext): Record<string, unknown> => {
     const message = ctx.switchToRpc().getData();
     return data ? message?.headers?.[data] : message?.headers;
   }

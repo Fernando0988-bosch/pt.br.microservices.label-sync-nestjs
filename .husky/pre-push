@@ -1,20 +1,52 @@
 #!/usr/bin/env sh
 
-echo "🧪 Executando testes antes do push..."
+echo "🚀 Running pre-push checks..."
+
+# Run full lint check
+echo "🔧 Running full lint check..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "❌ Lint check failed! Fix all lint errors before pushing."
+  exit 1
+fi
+
+# Run TypeScript type checking
+echo "🔍 Running TypeScript type checking..."
+npx tsc --noEmit --project tsconfig.base.json
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript type checking failed! Fix the type errors before pushing."
+  exit 1
+fi
+
+# Build all projects to ensure they compile
+echo "🏗️ Building all projects..."
+npm run build:all
+if [ $? -ne 0 ]; then
+  echo "❌ Build failed! Fix the build errors before pushing."
+  exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests before push..."
 
 # Verificar se há commits anteriores e origin/main existe
 if git rev-parse --verify origin/main >/dev/null 2>&1; then
   # origin/main existe, executar affected test
-  echo "📊 Executando testes affected..."
+  echo "📊 Running affected tests..."
   npx nx affected:test --coverage --base=origin/main --head=HEAD --maxWorkers=1
+  TEST_RESULT=$?
 else
   # origin/main não existe, executar testes das libs principais
-  echo "📊 Executando testes das bibliotecas principais..."
-  npx nx run-many --target=test --projects=auth,rabbitmq,common --coverage --maxWorkers=1
+  echo "📊 Running main library tests..."
+  npx nx run-many --target=test --projects=error-handling,rabbitmq,common --coverage --maxWorkers=1
+  TEST_RESULT=$?
 fi
 
-# Se os testes falharem, ainda permitir push (apenas avisar)
-if [ $? -ne 0 ]; then
-  echo "⚠️  Alguns testes falharam, mas permitindo push..."
-  echo "💡 Corrija os testes após o push"
+# Se os testes falharem, bloquear push
+if [ $TEST_RESULT -ne 0 ]; then
+  echo "❌ Tests failed! Fix the tests before pushing."
+  echo "💡 Run 'npm run test' locally to debug"
+  exit 1
 fi
+
+echo "✅ All pre-push checks passed!"

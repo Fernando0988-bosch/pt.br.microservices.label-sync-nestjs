@@ -6,9 +6,9 @@ export interface CatchErrorsOptions {
   logErrors?: boolean;
   rethrow?: boolean;
   defaultException?: new (service: string, error?: Error) => BaseException;
-  ignoreErrors?: (new (...args: any[]) => Error)[];
-  onError?: (error: Error, context: any) => void;
-  fallbackValue?: any;
+  ignoreErrors?: (new (...args: unknown[]) => Error)[];
+  onError?: (error: Error, context: Record<string, unknown>) => void;
+  fallbackValue?: unknown;
 }
 
 export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
@@ -27,7 +27,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
     const methodName = String(propertyKey);
     const logger = new Logger(`${className}.${methodName}`);
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const context = {
         className,
         methodName,
@@ -87,8 +87,8 @@ export function RetryOnError(retries: number = 3, delay: number = 1000): MethodD
     const originalMethod = descriptor.value;
     const logger = new Logger(`${target.constructor.name}.${String(propertyKey)}`);
 
-    descriptor.value = async function (...args: any[]) {
-      let lastError: any;
+    descriptor.value = async function (...args: unknown[]) {
+      let lastError: unknown;
 
       for (let attempt = 1; attempt <= retries + 1; attempt++) {
         try {

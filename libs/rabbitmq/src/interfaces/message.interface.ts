@@ -1,10 +1,10 @@
-export interface RabbitMQMessage<T = any> {
+export interface RabbitMQMessage<T = unknown> {
   id: string;
   timestamp: Date;
   data: T;
   correlationId?: string;
   replyTo?: string;
-  headers?: Record<string, any>;
+  headers?: Record<string, unknown>;
   properties?: MessageProperties;
 }
 
@@ -34,10 +34,10 @@ export interface ConsumeOptions {
   noAck?: boolean;
   exclusive?: boolean;
   priority?: number;
-  arguments?: Record<string, any>;
+  arguments?: Record<string, unknown>;
 }
 
-export interface MessageHandler<T = any> {
+export interface MessageHandler<T = unknown> {
   (message: RabbitMQMessage<T>, ack: () => void, nack: (requeue?: boolean) => void): Promise<void> | void;
 }
 

@@ -23,7 +23,7 @@ export interface ExchangeConfig {
   options?: {
     durable?: boolean;
     autoDelete?: boolean;
-    arguments?: Record<string, any>;
+    arguments?: Record<string, unknown>;
   };
 }
 
@@ -33,7 +33,7 @@ export interface QueueConfig {
     durable?: boolean;
     exclusive?: boolean;
     autoDelete?: boolean;
-    arguments?: Record<string, any>;
+    arguments?: Record<string, unknown>;
   };
   bindings?: QueueBinding[];
 }
@@ -41,7 +41,7 @@ export interface QueueConfig {
 export interface QueueBinding {
   exchange: string;
   routingKey: string;
-  arguments?: Record<string, any>;
+  arguments?: Record<string, unknown>;
 }
 
 export interface ConnectionStatus {

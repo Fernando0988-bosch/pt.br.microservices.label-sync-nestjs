@@ -29,7 +29,7 @@
     "lint:fix": "eslint . --fix --max-warnings 0",
     "lint:all": "nx run-many --target=lint --all",
     "lint:affected": "nx affected:lint",
-    "lint:check": "eslint . --max-warnings 0 --dry-run",
+    "lint:check": "eslint . --max-warnings 0",
     "prettier": "prettier --check . --ignore-unknown",
     "prettier:fix": "prettier --write . --ignore-unknown",
     "prettier:all": "nx format:write",
@@ -97,5 +97,18 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

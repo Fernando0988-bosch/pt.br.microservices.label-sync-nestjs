@@ -29,9 +29,9 @@ export class RabbitMQModule {
   }
 
   static forRootAsync(options: {
-    useFactory: (...args: any[]) => Promise<RabbitMQModuleOptions> | RabbitMQModuleOptions;
-    inject?: any[];
-    imports?: any[];
+    useFactory: (...args: unknown[]) => Promise<RabbitMQModuleOptions> | RabbitMQModuleOptions;
+    inject?: unknown[];
+    imports?: unknown[];
   }): DynamicModule {
     const providers: Provider[] = [
       {
