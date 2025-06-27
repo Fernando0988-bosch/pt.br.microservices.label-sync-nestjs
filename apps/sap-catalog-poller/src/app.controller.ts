@@ -10,12 +10,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getData() {
+  getData(): { message: string } {
     return this.appService.getData();
   }
 
   @Get('sap/:id')
-  async getSapData(@Param('id') id: string) {
+  getSapData(@Param('id') id: string): { id: string; status: string; data: unknown } {
     if (!id || id.length < 3) {
       throw new ValidationException([
         {
@@ -30,12 +30,12 @@ export class AppController {
   }
 
   @Get('sap-specific/:id')
-  async getSapDataSpecific(@Param('id') id: string) {
+  getSapDataSpecific(@Param('id') id: string): { id: string; status: string; data: unknown } {
     return this.appService.getSapDataWithSpecificError(id);
   }
 
   @Get('error')
-  testError() {
+  testError(): never {
     throw new BusinessLogicException('Erro de teste para demonstrar o tratamento');
   }
 }

@@ -1,1 +1,4 @@
-export interface CommonInterface {}
+export interface CommonInterface {
+  id: string;
+  createdAt: Date;
+}

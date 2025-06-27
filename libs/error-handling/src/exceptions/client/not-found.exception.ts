@@ -2,7 +2,7 @@ import { ErrorCode } from '../../constants';
 import { BaseException } from '../base';
 
 export class NotFoundException extends BaseException {
-  constructor(resource?: string, identifier?: any) {
+  constructor(resource?: string, identifier?: unknown) {
     const message =
       resource && identifier
         ? `${resource} com identificador ${identifier} não encontrado`
@@ -17,7 +17,7 @@ export class NotFoundException extends BaseException {
 }
 
 export class DataNotFoundException extends BaseException {
-  constructor(entity: string, criteria?: any) {
+  constructor(entity: string, criteria?: unknown) {
     super({
       errorCode: ErrorCode.DATA_NOT_FOUND,
       message: `${entity} não encontrado`,

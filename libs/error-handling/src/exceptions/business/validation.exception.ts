@@ -13,7 +13,7 @@ export class DataValidationException extends BaseException {
 }
 
 export class InvalidDataFormatException extends BaseException {
-  constructor(field: string, expectedFormat: string, receivedValue?: any) {
+  constructor(field: string, expectedFormat: string, receivedValue?: unknown) {
     super({
       errorCode: ErrorCode.INVALID_DATA_FORMAT,
       message: `Formato inválido para o campo ${field}. Esperado: ${expectedFormat}`,

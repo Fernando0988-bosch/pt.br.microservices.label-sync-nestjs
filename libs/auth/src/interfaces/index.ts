@@ -1,1 +1,4 @@
-export interface AuthInterface {}
+export interface AuthInterface {
+  id: string;
+  username: string;
+}

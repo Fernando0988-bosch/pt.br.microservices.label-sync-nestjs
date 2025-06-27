@@ -21,7 +21,7 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
     fallbackValue = null,
   } = options;
 
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const className = target.constructor.name;
     const methodName = String(propertyKey);
@@ -63,17 +63,23 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
         }
 
         if (error instanceof BaseException) {
-          if (rethrow) throw error;
+          if (rethrow) {
+            throw error;
+          }
           return fallbackValue;
         }
 
         if (defaultException && error instanceof Error) {
           const exception = new defaultException(`${className}.${methodName}`, error);
-          if (rethrow) throw exception;
+          if (rethrow) {
+            throw exception;
+          }
           return fallbackValue;
         }
 
-        if (rethrow) throw error;
+        if (rethrow) {
+          throw error;
+        }
         return fallbackValue;
       }
     };
@@ -82,8 +88,8 @@ export function CatchErrors(options: CatchErrorsOptions = {}): MethodDecorator {
   };
 }
 
-export function RetryOnError(retries: number = 3, delay: number = 1000): MethodDecorator {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+export function RetryOnError(retries = 3, delay = 1000): MethodDecorator {
+  return function (target: unknown, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const logger = new Logger(`${target.constructor.name}.${String(propertyKey)}`);
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthHandler {
-  async handle() {
+  handle(): { message: string } {
     return { message: 'Auth handler' };
   }
 }

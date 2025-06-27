@@ -20,7 +20,7 @@ fi
 
 # Run lint check on all files to ensure no 'any' types
 echo "🔧 Running strict lint check..."
-npx eslint . --max-warnings 50
+npx eslint . --max-warnings 0
 if [ $? -ne 0 ]; then
   echo "❌ ESLint strict check failed! Fix all lint errors (including 'any' types) before committing."
   echo "💡 Use 'npm run lint:fix' to auto-fix some issues"

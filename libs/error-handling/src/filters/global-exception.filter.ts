@@ -54,8 +54,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         statusCode: status,
         errorCode: this.mapStatusToErrorCode(status),
         message:
-          typeof response === 'string' ? response : (response as any)?.message || exception.message,
-        details: typeof response === 'object' ? (response as any)?.details : undefined,
+          typeof response === 'string'
+            ? response
+            : ((response as Record<string, unknown>)?.message ?? exception.message),
+        details:
+          typeof response === 'object' ? (response as Record<string, unknown>)?.details : undefined,
       };
     }
 
@@ -109,7 +112,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       504: ErrorCode.GATEWAY_TIMEOUT,
     };
 
-    return statusMap[status] || ErrorCode.EXTERNAL_SERVICE_ERROR;
+    return statusMap[status] ?? ErrorCode.EXTERNAL_SERVICE_ERROR;
   }
 
   private logError(exception: unknown, errorResponse: ErrorResponse, request: Request): void {
@@ -136,7 +139,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
   }
 
-  private sanitizeHeaders(headers: any): any {
+  private sanitizeHeaders(headers: unknown): unknown {
     const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key'];
     const sanitized = { ...headers };
 
@@ -149,8 +152,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     return sanitized;
   }
 
-  private sanitizeBody(body: any): any {
-    if (!body || typeof body !== 'object') return body;
+  private sanitizeBody(body: unknown): unknown {
+    if (!body || typeof body !== 'object') {
+      return body;
+    }
 
     const sensitiveFields = ['password', 'token', 'secret', 'key'];
     const sanitized = { ...body };

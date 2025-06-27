@@ -28,6 +28,7 @@
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix --max-warnings 0",
     "lint:all": "nx run-many --target=lint --all",
+    "lint:rabbitmq": "eslint libs/rabbitmq/src --max-warnings 0",
     "lint:affected": "nx affected:lint",
     "lint:check": "eslint . --max-warnings 0",
     "prettier": "prettier --check . --ignore-unknown",

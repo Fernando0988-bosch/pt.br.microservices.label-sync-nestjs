@@ -4,7 +4,7 @@ export interface ErrorResponse {
   statusCode: number;
   errorCode: ErrorCode;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: string;
   path?: string;
   method?: string;
@@ -14,7 +14,7 @@ export interface ErrorResponse {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
 export interface ErrorContext {
@@ -22,5 +22,5 @@ export interface ErrorContext {
   operation?: string;
   userId?: string;
   correlationId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

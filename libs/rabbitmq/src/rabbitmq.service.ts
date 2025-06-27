@@ -1,21 +1,21 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit, Inject } from '@nestjs/common';
 import * as amqp from 'amqplib';
-import { 
-  RabbitMQConnectionConfig, 
-  ConnectionStatus, 
-  ExchangeConfig, 
+import {
+  ConnectionStatus,
+  ExchangeConfig,
   QueueConfig,
-  RabbitMQModuleOptions 
+  RabbitMQModuleOptions,
+  RabbitMQConnection,
 } from './interfaces';
-import { 
+import {
   RabbitMQConnectionException,
-  ExternalServiceException 
+  ExternalServiceException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 
 @Injectable()
 export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RabbitMQService.name);
-  private connection: amqp.Connection | null = null;
+  private connection: RabbitMQConnection | null = null;
   private channel: amqp.Channel | null = null;
   private connectionStatus: ConnectionStatus;
   private reconnectTimer: NodeJS.Timeout | null = null;
@@ -23,56 +23,57 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   private readonly reconnectDelay = 5000;
 
   constructor(
-    @Inject('RABBITMQ_OPTIONS') private readonly options: RabbitMQModuleOptions
+    @Inject('RABBITMQ_OPTIONS') private readonly options: RabbitMQModuleOptions,
   ) {
     this.connectionStatus = {
       isConnected: false,
       connectionUrl: this.buildConnectionUrl(),
-      reconnectAttempts: 0
+      reconnectAttempts: 0,
     };
   }
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     await this.connect();
   }
 
-  async onModuleDestroy() {
+  async onModuleDestroy(): Promise<void> {
     await this.disconnect();
   }
 
   async connect(): Promise<void> {
     try {
       this.logger.log('Attempting to connect to RabbitMQ...');
-      
-      const connectionUrl = this.buildConnectionUrl();
-      this.connection = await amqp.connect(connectionUrl, {
-        heartbeat: this.options.connection.heartbeat || 60,
-        timeout: this.options.connection.connectionTimeout || 10000
-      });
 
-      this.channel = await this.connection.createChannel();
-      
-      if (this.options.prefetchCount) {
+      const connectionUrl = this.buildConnectionUrl();
+      this.connection = (await amqp.connect(connectionUrl, {
+        heartbeat: this.options.connection.heartbeat ?? 60,
+        timeout: this.options.connection.connectionTimeout ?? 10000,
+      })) as RabbitMQConnection;
+
+      if (this.connection) {
+        this.channel = (await this.connection.createChannel()) as amqp.Channel;
+      }
+
+      if (this.options.prefetchCount && this.channel) {
         await this.channel.prefetch(this.options.prefetchCount);
       }
 
       this.setupConnectionEventHandlers();
       await this.setupTopology();
-      
+
       this.connectionStatus = {
         ...this.connectionStatus,
         isConnected: true,
         lastConnected: new Date(),
-        reconnectAttempts: 0
+        reconnectAttempts: 0,
       };
 
       this.logger.log('Successfully connected to RabbitMQ');
-      
     } catch (error) {
       this.logger.error('Failed to connect to RabbitMQ', error);
       this.connectionStatus.isConnected = false;
       this.connectionStatus.lastDisconnected = new Date();
-      
+
       throw new RabbitMQConnectionException(error as Error);
     }
   }
@@ -96,9 +97,8 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
 
       this.connectionStatus.isConnected = false;
       this.connectionStatus.lastDisconnected = new Date();
-      
+
       this.logger.log('Disconnected from RabbitMQ');
-      
     } catch (error) {
       this.logger.error('Error during RabbitMQ disconnection', error);
     }
@@ -117,19 +117,12 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
 
   async assertExchange(config: ExchangeConfig): Promise<void> {
     const channel = this.getChannel();
-    await channel.assertExchange(
-      config.name,
-      config.type,
-      config.options || { durable: true }
-    );
+    await channel.assertExchange(config.name, config.type, config.options ?? { durable: true });
   }
 
   async assertQueue(config: QueueConfig): Promise<amqp.Replies.AssertQueue> {
     const channel = this.getChannel();
-    const queueResult = await channel.assertQueue(
-      config.name,
-      config.options || { durable: true }
-    );
+    const queueResult = await channel.assertQueue(config.name, config.options ?? { durable: true });
 
     if (config.bindings) {
       for (const binding of config.bindings) {
@@ -137,7 +130,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
           config.name,
           binding.exchange,
           binding.routingKey,
-          binding.arguments
+          binding.arguments,
         );
       }
     }
@@ -145,7 +138,10 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
     return queueResult;
   }
 
-  async deleteQueue(queueName: string, options?: { ifUnused?: boolean; ifEmpty?: boolean }): Promise<void> {
+  async deleteQueue(
+    queueName: string,
+    options?: { ifUnused?: boolean; ifEmpty?: boolean },
+  ): Promise<void> {
     const channel = this.getChannel();
     await channel.deleteQueue(queueName, options);
   }
@@ -163,13 +159,15 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   private buildConnectionUrl(): string {
     const { host, port, username, password, vhost, protocol } = this.options.connection;
     const vhostPath = vhost ? `/${vhost}` : '';
-    return `${protocol || 'amqp'}://${username}:${password}@${host}:${port}${vhostPath}`;
+    return `${protocol ?? 'amqp'}://${username}:${password}@${host}:${port}${vhostPath}`;
   }
 
   private setupConnectionEventHandlers(): void {
-    if (!this.connection) return;
+    if (!this.connection) {
+      return;
+    }
 
-    this.connection.on('error', (error) => {
+    this.connection.on('error', (error?: Error) => {
       this.logger.error('RabbitMQ connection error', error);
       this.connectionStatus.isConnected = false;
       this.connectionStatus.lastDisconnected = new Date();
@@ -184,7 +182,7 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (this.channel) {
-      this.channel.on('error', (error) => {
+      this.channel.on('error', (error: Error) => {
         this.logger.error('RabbitMQ channel error', error);
       });
 
@@ -195,23 +193,28 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnectTimer || this.connectionStatus.reconnectAttempts >= this.maxReconnectAttempts) {
+    if (
+      this.reconnectTimer ??
+      this.connectionStatus.reconnectAttempts >= this.maxReconnectAttempts
+    ) {
       return;
     }
 
     this.connectionStatus.reconnectAttempts++;
-    
+
     this.logger.log(
-      `Scheduling reconnection attempt ${this.connectionStatus.reconnectAttempts}/${this.maxReconnectAttempts} in ${this.reconnectDelay}ms`
+      `Scheduling reconnection attempt ${this.connectionStatus.reconnectAttempts}/${this.maxReconnectAttempts} in ${this.reconnectDelay}ms`,
     );
 
-    this.reconnectTimer = setTimeout(async () => {
-      this.reconnectTimer = null;
-      try {
-        await this.connect();
-      } catch (error) {
-        this.logger.error('Reconnection failed', error);
-      }
+    this.reconnectTimer = setTimeout(() => {
+      void (async () => {
+        this.reconnectTimer = null;
+        try {
+          await this.connect();
+        } catch (error) {
+          this.logger.error('Reconnection failed', error);
+        }
+      })();
     }, this.reconnectDelay);
   }
 
@@ -230,7 +233,6 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
       }
 
       this.logger.log('RabbitMQ topology setup completed');
-      
     } catch (error) {
       this.logger.error('Failed to setup RabbitMQ topology', error);
       throw new ExternalServiceException('RabbitMQ topology setup failed', error as Error);

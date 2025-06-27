@@ -14,8 +14,8 @@ export class AppService {
     logErrors: true,
   })
   @RetryOnError(3, 1000)
-  async getSapData(id: string) {
-    const data = await this.simulateSapCall(id);
+  getSapData(id: string): { id: string; status: string; data: unknown } {
+    const data = this.simulateSapCall(id);
 
     if (!data) {
       throw new NotFoundException('Dados SAP', id);
@@ -28,9 +28,9 @@ export class AppService {
     return data;
   }
 
-  async getSapDataWithSpecificError(id: string) {
+  getSapDataWithSpecificError(id: string): { id: string; status: string; data: unknown } {
     try {
-      const data = await this.simulateSapCall(id);
+      const data = this.simulateSapCall(id);
       if (!data) {
         throw new NotFoundException('Dados SAP', id);
       }
@@ -43,7 +43,7 @@ export class AppService {
     }
   }
 
-  private async simulateSapCall(id: string) {
+  private simulateSapCall(id: string): { id: string; status: string; data: unknown } {
     if (id === 'error') {
       throw new Error('SAP connection failed');
     }

@@ -1,4 +1,4 @@
-import { PublishOptions, RabbitMQMessage } from './message.interface';
+import { PublishOptions } from './message.interface';
 
 export interface IPublisher {
   publish<T>(data: T, options: PublishOptions): Promise<boolean>;

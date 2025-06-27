@@ -13,7 +13,7 @@ export class TimeoutException extends BaseException {
 }
 
 export class GatewayTimeoutException extends BaseException {
-  constructor(message?: string, details?: any) {
+  constructor(message?: string, details?: unknown) {
     super({
       errorCode: ErrorCode.GATEWAY_TIMEOUT,
       message,

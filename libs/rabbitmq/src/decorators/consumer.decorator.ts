@@ -12,31 +12,34 @@ export interface ConsumerMetadata {
 export function RabbitMQConsumer(
   queue: string,
   options?: ConsumeOptions,
-  retryPolicy?: RetryPolicy
+  retryPolicy?: RetryPolicy,
 ): MethodDecorator {
   return SetMetadata(RABBITMQ_CONSUMER_METADATA, {
     queue,
     options,
-    retryPolicy
+    retryPolicy,
   } as ConsumerMetadata);
 }
 
-export function QueueConsumer(queueName: string, options?: Partial<ConsumeOptions>): MethodDecorator {
+export function QueueConsumer(
+  queueName: string,
+  options?: Partial<ConsumeOptions>,
+): MethodDecorator {
   return RabbitMQConsumer(queueName, { queue: queueName, ...options });
 }
 
 export function RetryableConsumer(
   queue: string,
-  maxRetries: number = 3,
-  initialDelay: number = 1000,
-  backoffMultiplier: number = 2,
-  maxDelay: number = 30000
+  maxRetries = 3,
+  initialDelay = 1000,
+  backoffMultiplier = 2,
+  maxDelay = 30000,
 ): MethodDecorator {
   const retryPolicy: RetryPolicy = {
     maxRetries,
     initialDelay,
     backoffMultiplier,
-    maxDelay
+    maxDelay,
   };
 
   return RabbitMQConsumer(queue, { queue }, retryPolicy);

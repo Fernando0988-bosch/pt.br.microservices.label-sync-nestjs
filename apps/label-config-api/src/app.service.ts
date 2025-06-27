@@ -13,8 +13,12 @@ export class AppService {
     logErrors: true,
   })
   @RetryOnError(3, 1000)
-  async getLabelConfig(id: string) {
-    const data = await this.simulateLabelConfigCall(id);
+  getLabelConfig(id: string): {
+    id: string;
+    status: string;
+    config: { template: string; format: string };
+  } {
+    const data = this.simulateLabelConfigCall(id);
 
     if (!data) {
       throw new NotFoundException('Configuração de Label', id);
@@ -27,9 +31,13 @@ export class AppService {
     return data;
   }
 
-  async getLabelConfigWithSpecificError(id: string) {
+  getLabelConfigWithSpecificError(id: string): {
+    id: string;
+    status: string;
+    config: { template: string; format: string };
+  } {
     try {
-      const data = await this.simulateLabelConfigCall(id);
+      const data = this.simulateLabelConfigCall(id);
       if (!data) {
         throw new NotFoundException('Configuração de Label', id);
       }
@@ -45,7 +53,11 @@ export class AppService {
     }
   }
 
-  private async simulateLabelConfigCall(id: string) {
+  private simulateLabelConfigCall(id: string): {
+    id: string;
+    status: string;
+    config: { template: string; format: string };
+  } {
     if (id === 'error') {
       throw new Error('LABEL_CONFIG connection failed');
     }

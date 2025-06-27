@@ -2,7 +2,7 @@ import { ErrorCode } from '../../constants';
 import { BaseException } from '../base';
 
 export class BusinessLogicException extends BaseException {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super({
       errorCode: ErrorCode.BUSINESS_RULE_VIOLATION,
       message,

@@ -16,7 +16,7 @@ export class ErrorHandlingModule {
   static forRoot(options: ErrorHandlingModuleOptions = {}): DynamicModule {
     const { enableGlobalFilter = true, enableErrorLogging = true } = options;
 
-    const providers: any[] = [];
+    const providers: Array<{ provide: unknown; useClass: unknown }> = [];
 
     if (enableGlobalFilter) {
       providers.push({

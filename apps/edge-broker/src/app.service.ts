@@ -14,8 +14,8 @@ export class AppService {
     logErrors: true,
   })
   @RetryOnError(3, 1000)
-  async getBrokerData(id: string) {
-    const data = await this.simulateBrokerCall(id);
+  getBrokerData(id: string): { id: string; status: string; service: string } {
+    const data = this.simulateBrokerCall(id);
 
     if (!data) {
       throw new NotFoundException('Dados Broker', id);
@@ -28,9 +28,9 @@ export class AppService {
     return data;
   }
 
-  async testRabbitMQConnection(id: string) {
+  testRabbitMQConnection(id: string): { id: string; connected: boolean; queue: string } {
     try {
-      const connection = await this.simulateRabbitMQConnection(id);
+      const connection = this.simulateRabbitMQConnection(id);
       if (!connection) {
         throw new NotFoundException('Conexão RabbitMQ', id);
       }
@@ -43,14 +43,18 @@ export class AppService {
     }
   }
 
-  private async simulateBrokerCall(id: string) {
+  private simulateBrokerCall(id: string): { id: string; status: string; service: string } {
     if (id === 'error') {
       throw new Error('Broker connection failed');
     }
     return { id, status: 'AVAILABLE', service: 'edge-broker' };
   }
 
-  private async simulateRabbitMQConnection(id: string) {
+  private simulateRabbitMQConnection(id: string): {
+    id: string;
+    connected: boolean;
+    queue: string;
+  } {
     if (id === 'rabbitmq-error') {
       throw new Error('RabbitMQ connection timeout');
     }

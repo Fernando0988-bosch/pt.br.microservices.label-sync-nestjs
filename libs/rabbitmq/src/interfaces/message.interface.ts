@@ -25,6 +25,9 @@ export interface PublishOptions extends MessageProperties {
   routingKey: string;
   mandatory?: boolean;
   immediate?: boolean;
+  correlationId?: string;
+  replyTo?: string;
+  headers?: Record<string, unknown>;
 }
 
 export interface ConsumeOptions {
@@ -38,7 +41,11 @@ export interface ConsumeOptions {
 }
 
 export interface MessageHandler<T = unknown> {
-  (message: RabbitMQMessage<T>, ack: () => void, nack: (requeue?: boolean) => void): Promise<void> | void;
+  (
+    message: RabbitMQMessage<T>,
+    ack: () => void,
+    nack: (requeue?: boolean) => void,
+  ): Promise<void> | void;
 }
 
 export interface DeadLetterConfig {

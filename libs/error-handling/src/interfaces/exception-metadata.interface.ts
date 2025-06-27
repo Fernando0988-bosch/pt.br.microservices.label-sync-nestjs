@@ -4,7 +4,7 @@ import { ErrorContext } from './error-response.interface';
 export interface ExceptionMetadata {
   errorCode: ErrorCode;
   message?: string;
-  details?: any;
+  details?: unknown;
   context?: ErrorContext;
   cause?: Error;
   retryable?: boolean;

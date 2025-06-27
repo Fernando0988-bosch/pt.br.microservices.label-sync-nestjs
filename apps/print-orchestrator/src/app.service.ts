@@ -7,6 +7,12 @@ import {
   QueueException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 import { CatchErrors, RetryOnError } from '@pt.br.microservices.label-sync-nestjs/error-handling';
+import {
+  PrintJobData,
+  PrintJob,
+  PrintJobStatus,
+  PrinterInfo,
+} from './interfaces/print-job.interface';
 
 @Injectable()
 export class AppService {
@@ -16,15 +22,15 @@ export class AppService {
     ['HP-003', { id: 'HP-003', status: 'online', queue: 5 }],
   ]);
 
-  private readonly printJobs = new Map();
+  private readonly printJobs = new Map<string, PrintJob>();
 
   @CatchErrors({
     defaultException: ExternalServiceException,
     logErrors: true,
   })
   @RetryOnError(3, 1000)
-  async createPrintJob(printJobData: any) {
-    const printer = await this.checkPrinterConnection(printJobData.printerId);
+  createPrintJob(printJobData: PrintJobData): PrintJob {
+    const printer = this.checkPrinterConnection(printJobData.printerId);
 
     if (printer.status === 'offline') {
       throw new PrinterConnectionException(`Impressora ${printJobData.printerId} está offline`);
@@ -41,10 +47,9 @@ export class AppService {
       id: jobId,
       printerId: printJobData.printerId,
       documentId: printJobData.documentId,
-      status: 'queued',
+      status: 'pending' as const,
       createdAt: new Date(),
-      pages: printJobData.pages || 1,
-      priority: printJobData.priority || 'normal',
+      data: printJobData,
     };
 
     this.printJobs.set(jobId, job);
@@ -57,7 +62,7 @@ export class AppService {
     defaultException: NotFoundException,
     logErrors: true,
   })
-  async getPrintJobStatus(id: string) {
+  getPrintJobStatus(id: string): PrintJobStatus {
     const job = this.printJobs.get(id);
 
     if (!job) {
@@ -65,13 +70,20 @@ export class AppService {
     }
 
     // Simulate job status changes
-    if (job.status === 'queued' && Math.random() > 0.5) {
+    if (job.status === 'pending' && Math.random() > 0.5) {
       job.status = 'printing';
     } else if (job.status === 'printing' && Math.random() > 0.7) {
       job.status = 'completed';
     }
 
-    return job;
+    return {
+      id: job.id,
+      status: job.status,
+      progress: job.status === 'completed' ? 100 : Math.floor(Math.random() * 90),
+      printerId: job.printerId,
+      queuePosition: job.status === 'pending' ? Math.floor(Math.random() * 5) + 1 : undefined,
+      estimatedTime: job.status === 'pending' ? Math.floor(Math.random() * 300) + 30 : undefined,
+    };
   }
 
   @CatchErrors({
@@ -79,7 +91,7 @@ export class AppService {
     logErrors: true,
   })
   @RetryOnError(2, 500)
-  async getPrinterStatus(id: string) {
+  getPrinterStatus(id: string): PrinterInfo {
     const printer = this.printers.get(id);
 
     if (!printer) {
@@ -97,10 +109,11 @@ export class AppService {
     }
 
     return {
-      ...printer,
-      lastChecked: new Date(),
-      paperLevel: Math.floor(Math.random() * 100),
-      tonerLevel: Math.floor(Math.random() * 100),
+      id: printer.id,
+      status: printer.status as 'online' | 'offline' | 'maintenance',
+      queue: printer.queue,
+      location: `Floor ${Math.floor(Math.random() * 3) + 1}`,
+      model: `HP LaserJet ${printer.id.split('-')[1]}`,
     };
   }
 
@@ -108,8 +121,10 @@ export class AppService {
     defaultException: QueueException,
     logErrors: true,
   })
-  async processQueue() {
-    const queuedJobs = Array.from(this.printJobs.values()).filter((job) => job.status === 'queued');
+  processQueue(): { processed: number; remaining: number } {
+    const queuedJobs = Array.from(this.printJobs.values()).filter(
+      (job) => job.status === 'pending',
+    );
 
     if (queuedJobs.length === 0) {
       throw new BusinessLogicException('Não há jobs na fila para processar');
@@ -121,21 +136,21 @@ export class AppService {
 
     for (const job of jobsToProcess) {
       try {
-        await this.processJob(job);
+        this.processJob(job);
         processedJobs.push(job.id);
       } catch (error) {
-        throw new QueueException(`Falha ao processar job ${job.id}: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        throw new QueueException(`Falha ao processar job ${job.id}: ${errorMessage}`);
       }
     }
 
     return {
       processed: processedJobs.length,
       remaining: queuedJobs.length - processedJobs.length,
-      processedJobs,
     };
   }
 
-  private async checkPrinterConnection(printerId: string) {
+  private checkPrinterConnection(printerId: string): PrinterInfo {
     const printer = this.printers.get(printerId);
 
     if (!printer) {
@@ -149,28 +164,28 @@ export class AppService {
       );
     }
 
-    return printer;
+    return {
+      id: printer.id,
+      status: printer.status as 'online' | 'offline' | 'maintenance',
+      queue: printer.queue,
+    };
   }
 
-  private async processJob(job: any) {
-    // Simulate job processing
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
+  private processJob(job: PrintJob): void {
+    // Simulate immediate job processing
     job.status = 'printing';
-    job.startedAt = new Date();
 
-    // Simulate printing time based on pages
-    const printingTime = job.pages * 2000; // 2 seconds per page
-    await new Promise((resolve) => setTimeout(resolve, printingTime));
+    // Simulate completion
+    setTimeout(() => {
+      job.status = 'completed';
+      job.completedAt = new Date();
 
-    job.status = 'completed';
-    job.completedAt = new Date();
-
-    // Update printer queue
-    const printer = this.printers.get(job.printerId);
-    if (printer && printer.queue > 0) {
-      printer.queue -= 1;
-    }
+      // Update printer queue
+      const printer = this.printers.get(job.printerId);
+      if (printer && printer.queue > 0) {
+        printer.queue -= 1;
+      }
+    }, 1000);
   }
 
   getData(): { message: string } {

@@ -1,4 +1,4 @@
-import { Module, DynamicModule, Global, Provider } from '@nestjs/common';
+import { Module, DynamicModule, Global, Provider, Type, ForwardReference, InjectionToken, OptionalFactoryDependency } from '@nestjs/common';
 import { RabbitMQService } from './rabbitmq.service';
 import { PublisherService } from './publishers';
 import { ConsumerService } from './consumers';
@@ -12,19 +12,19 @@ export class RabbitMQModule {
     const providers: Provider[] = [
       {
         provide: 'RABBITMQ_OPTIONS',
-        useValue: options
+        useValue: options,
       },
       RabbitMQService,
       PublisherService,
       ConsumerService,
-      RabbitMQHelperService
+      RabbitMQHelperService,
     ];
 
     return {
       module: RabbitMQModule,
       providers,
       exports: [RabbitMQService, PublisherService, ConsumerService, RabbitMQHelperService],
-      global: options.isGlobal !== false
+      global: options.isGlobal !== false,
     };
   }
 
@@ -37,20 +37,20 @@ export class RabbitMQModule {
       {
         provide: 'RABBITMQ_OPTIONS',
         useFactory: options.useFactory,
-        inject: options.inject || []
+        inject: (options.inject as (InjectionToken | OptionalFactoryDependency)[]) ?? [],
       },
       RabbitMQService,
       PublisherService,
       ConsumerService,
-      RabbitMQHelperService
+      RabbitMQHelperService,
     ];
 
     return {
       module: RabbitMQModule,
-      imports: options.imports || [],
+      imports: (options.imports as (Type<unknown> | DynamicModule | ForwardReference<unknown> | Promise<DynamicModule>)[]) ?? [],
       providers,
       exports: [RabbitMQService, PublisherService, ConsumerService, RabbitMQHelperService],
-      global: true
+      global: true,
     };
   }
 
@@ -63,17 +63,17 @@ export class RabbitMQModule {
   }): RabbitMQModuleOptions {
     return {
       connection: {
-        host: config.host || process.env.RABBITMQ_HOST || 'localhost',
-        port: config.port || parseInt(process.env.RABBITMQ_PORT || '5672'),
-        username: config.username || process.env.RABBITMQ_USERNAME || 'admin',
-        password: config.password || process.env.RABBITMQ_PASSWORD || 'admin123',
-        vhost: config.vhost || process.env.RABBITMQ_VHOST || '/',
+        host: config.host ?? process.env['RABBITMQ_HOST'] ?? 'localhost',
+        port: config.port ?? parseInt(process.env['RABBITMQ_PORT'] ?? '5672'),
+        username: config.username ?? process.env['RABBITMQ_USERNAME'] ?? 'admin',
+        password: config.password ?? process.env['RABBITMQ_PASSWORD'] ?? 'admin123',
+        vhost: config.vhost ?? process.env['RABBITMQ_VHOST'] ?? '/',
         protocol: 'amqp',
         heartbeat: 60,
-        connectionTimeout: 10000
+        connectionTimeout: 10000,
       },
       prefetchCount: 10,
-      isGlobal: true
+      isGlobal: true,
     };
   }
 }

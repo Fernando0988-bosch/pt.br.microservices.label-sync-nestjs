@@ -2,7 +2,7 @@ import { ErrorCode } from '../../constants';
 import { BaseException } from '../base';
 
 export class UnauthorizedException extends BaseException {
-  constructor(message?: string, details?: any) {
+  constructor(message?: string, details?: unknown) {
     super({
       errorCode: ErrorCode.UNAUTHORIZED,
       message,

@@ -1,18 +1,18 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import * as amqp from 'amqplib';
 import { RabbitMQService } from '../rabbitmq.service';
-import { 
-  IConsumer, 
-  ConsumeOptions, 
-  MessageHandler, 
-  ConsumerStatus, 
+import {
+  IConsumer,
+  ConsumeOptions,
+  MessageHandler,
+  ConsumerStatus,
   ConsumerStats,
   RabbitMQMessage,
-  RetryPolicy 
+  RetryPolicy,
 } from '../interfaces';
-import { 
-  RabbitMQConnectionException,
-  ExternalServiceException 
+import {
+  // RabbitMQConnectionException,
+  ExternalServiceException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 
 @Injectable()
@@ -23,48 +23,51 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
 
   constructor(private readonly rabbitMQService: RabbitMQService) {}
 
-  async onModuleDestroy() {
+  async onModuleDestroy(): Promise<void> {
     await this.stopAll();
   }
 
   async consume<T>(
-    queue: string, 
-    handler: MessageHandler<T>, 
-    options: ConsumeOptions = { queue }
+    queue: string,
+    handler: MessageHandler<T>,
+    options: ConsumeOptions = { queue },
   ): Promise<string> {
     try {
       const channel = this.rabbitMQService.getChannel();
-      
+
       const consumeOptions = {
-        noAck: options.noAck || false,
-        exclusive: options.exclusive || false,
-        priority: options.priority || 0,
-        arguments: options.arguments || {}
+        noAck: options.noAck ?? false,
+        exclusive: options.exclusive ?? false,
+        priority: options.priority ?? 0,
+        arguments: options.arguments ?? {},
       };
 
       const consumerResult = await channel.consume(
         queue,
-        async (msg) => {
-          if (!msg) return;
-          
-          await this.handleMessage(msg, handler, consumeOptions.noAck, queue);
+        (msg) => {
+          void (async () => {
+            if (!msg) {
+              return;
+            }
+
+            await this.handleMessage(msg, handler, consumeOptions.noAck, queue);
+          })();
         },
-        consumeOptions
+        consumeOptions,
       );
 
       const consumerTag = consumerResult.consumerTag;
-      
+
       this.consumers.set(consumerTag, {
         consumerTag,
         queue,
         isActive: true,
         messageCount: 0,
-        errors: 0
+        errors: 0,
       });
 
       this.logger.log(`Started consumer ${consumerTag} for queue ${queue}`);
       return consumerTag;
-      
     } catch (error) {
       this.logger.error(`Failed to start consumer for queue ${queue}`, error);
       throw new ExternalServiceException('Failed to start consumer', error as Error);
@@ -75,33 +78,36 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
     queue: string,
     handler: MessageHandler<T>,
     retryPolicy: RetryPolicy,
-    options: ConsumeOptions = { queue }
+    options: ConsumeOptions = { queue },
   ): Promise<string> {
     await this.setupRetryQueue(queue, retryPolicy);
-    
-    return this.consume(queue, async (message, ack, nack) => {
-      try {
-        await handler(message, ack, nack);
-      } catch (error) {
-        await this.handleRetry(message, error as Error, retryPolicy, queue);
-        nack(false);
-      }
-    }, options);
+
+    return this.consume(
+      queue,
+      async (message, ack, nack) => {
+        try {
+          await handler(message as RabbitMQMessage<T>, ack, nack);
+        } catch (error) {
+          this.handleRetry(message, error as Error, retryPolicy, queue);
+          nack(false);
+        }
+      },
+      options,
+    );
   }
 
   async stop(consumerTag: string): Promise<void> {
     try {
       const channel = this.rabbitMQService.getChannel();
       await channel.cancel(consumerTag);
-      
+
       const consumer = this.consumers.get(consumerTag);
       if (consumer) {
         consumer.isActive = false;
         this.consumers.delete(consumerTag);
       }
-      
+
       this.logger.log(`Stopped consumer ${consumerTag}`);
-      
     } catch (error) {
       this.logger.error(`Failed to stop consumer ${consumerTag}`, error);
       throw new ExternalServiceException('Failed to stop consumer', error as Error);
@@ -110,7 +116,7 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
 
   async stopAll(): Promise<void> {
     const consumerTags = Array.from(this.consumers.keys());
-    
+
     for (const consumerTag of consumerTags) {
       try {
         await this.stop(consumerTag);
@@ -118,18 +124,18 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
         this.logger.error(`Failed to stop consumer ${consumerTag}`, error);
       }
     }
-    
+
     this.logger.log('Stopped all consumers');
   }
 
   isConsuming(consumerTag: string): boolean {
     const consumer = this.consumers.get(consumerTag);
-    return consumer?.isActive || false;
+    return consumer?.isActive ?? false;
   }
 
   getConsumerStats(): ConsumerStats {
     const consumers = Array.from(this.consumers.values());
-    const activeConsumers = consumers.filter(c => c.isActive).length;
+    const activeConsumers = consumers.filter((c) => c.isActive).length;
     const totalMessagesProcessed = consumers.reduce((sum, c) => sum + c.messageCount, 0);
     const totalErrors = consumers.reduce((sum, c) => sum + c.errors, 0);
 
@@ -138,11 +144,11 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
       activeConsumers,
       totalMessagesProcessed,
       totalErrors,
-      consumers
+      consumers,
     };
   }
 
-  async pauseConsumer(consumerTag: string): Promise<void> {
+  pauseConsumer(consumerTag: string): void {
     const consumer = this.consumers.get(consumerTag);
     if (consumer) {
       consumer.isActive = false;
@@ -150,7 +156,7 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
     }
   }
 
-  async resumeConsumer(consumerTag: string): Promise<void> {
+  resumeConsumer(consumerTag: string): void {
     const consumer = this.consumers.get(consumerTag);
     if (consumer) {
       consumer.isActive = true;
@@ -162,47 +168,46 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
     msg: amqp.ConsumeMessage,
     handler: MessageHandler<T>,
     noAck: boolean,
-    queue: string
+    queue: string,
   ): Promise<void> {
     const consumerTag = msg.fields.consumerTag;
     const consumer = this.consumers.get(consumerTag);
-    
-    if (!consumer || !consumer.isActive) {
+
+    if (!consumer?.isActive) {
       return;
     }
 
     try {
       const messageContent = msg.content.toString();
       const parsedMessage: RabbitMQMessage<T> = JSON.parse(messageContent);
-      
+
       const channel = this.rabbitMQService.getChannel();
-      
-      const ack = () => {
+
+      const ack = (): void => {
         if (!noAck) {
           channel.ack(msg);
         }
       };
-      
-      const nack = (requeue = true) => {
+
+      const nack = (requeue = true): void => {
         if (!noAck) {
           channel.nack(msg, false, requeue);
         }
       };
 
       await handler(parsedMessage, ack, nack);
-      
+
       consumer.messageCount++;
       consumer.lastMessageProcessed = new Date();
-      
+
       this.logger.debug(`Processed message from queue ${queue}`);
-      
     } catch (error) {
       if (consumer) {
         consumer.errors++;
       }
-      
+
       this.logger.error(`Error handling message from queue ${queue}`, error);
-      
+
       if (!noAck) {
         const channel = this.rabbitMQService.getChannel();
         channel.nack(msg, false, false);
@@ -213,42 +218,44 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
   private async setupRetryQueue(originalQueue: string, retryPolicy: RetryPolicy): Promise<void> {
     const retryQueueName = `${originalQueue}.retry`;
     const deadLetterQueueName = `${originalQueue}.dead-letter`;
-    
+
     try {
       const channel = this.rabbitMQService.getChannel();
-      
+
       await channel.assertQueue(deadLetterQueueName, { durable: true });
-      
+
       await channel.assertQueue(retryQueueName, {
         durable: true,
         arguments: {
           'x-dead-letter-exchange': '',
           'x-dead-letter-routing-key': originalQueue,
-          'x-message-ttl': retryPolicy.initialDelay
-        }
+          'x-message-ttl': retryPolicy.initialDelay,
+        },
       });
-      
+
       this.retryQueues.set(originalQueue, retryQueueName);
-      
     } catch (error) {
       this.logger.error(`Failed to setup retry queue for ${originalQueue}`, error);
       throw new ExternalServiceException('Failed to setup retry queue', error as Error);
     }
   }
 
-  private async handleRetry<T>(
+  private handleRetry<T>(
     message: RabbitMQMessage<T>,
     error: Error,
     retryPolicy: RetryPolicy,
-    originalQueue: string
-  ): Promise<void> {
-    const retryCount = (message.headers?.['x-retry-count'] || 0) + 1;
-    
+    originalQueue: string,
+  ): void {
+    const retryCount = (Number(message.headers?.['x-retry-count']) || 0) + 1;
+
     if (retryCount > retryPolicy.maxRetries) {
-      this.logger.error(`Message exceeded max retries (${retryPolicy.maxRetries}), sending to dead letter queue`, {
-        messageId: message.id,
-        error: error.message
-      });
+      this.logger.error(
+        `Message exceeded max retries (${retryPolicy.maxRetries}), sending to dead letter queue`,
+        {
+          messageId: message.id,
+          error: error.message,
+        },
+      );
       return;
     }
 
@@ -262,7 +269,7 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
       const channel = this.rabbitMQService.getChannel();
       const delay = Math.min(
         retryPolicy.initialDelay * Math.pow(retryPolicy.backoffMultiplier, retryCount - 1),
-        retryPolicy.maxDelay
+        retryPolicy.maxDelay,
       );
 
       const retryMessage = {
@@ -271,19 +278,20 @@ export class ConsumerService implements IConsumer, OnModuleDestroy {
           ...message.headers,
           'x-retry-count': retryCount,
           'x-original-error': error.message,
-          'x-retry-delay': delay
-        }
+          'x-retry-delay': delay,
+        },
       };
 
       const buffer = Buffer.from(JSON.stringify(retryMessage));
-      
+
       channel.sendToQueue(retryQueue, buffer, {
         persistent: true,
-        headers: retryMessage.headers
+        headers: retryMessage.headers,
       });
 
-      this.logger.warn(`Scheduled retry ${retryCount}/${retryPolicy.maxRetries} for message ${message.id} with delay ${delay}ms`);
-      
+      this.logger.warn(
+        `Scheduled retry ${retryCount}/${retryPolicy.maxRetries} for message ${message.id} with delay ${delay}ms`,
+      );
     } catch (retryError) {
       this.logger.error(`Failed to schedule retry for message ${message.id}`, retryError);
     }

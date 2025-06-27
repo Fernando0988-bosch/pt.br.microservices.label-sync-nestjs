@@ -5,18 +5,24 @@ import {
   ExternalServiceException,
 } from '@pt.br.microservices.label-sync-nestjs/error-handling';
 import { AppService } from './app.service';
+import {
+  PrintJobData,
+  PrintJob,
+  PrintJobStatus,
+  PrinterInfo,
+} from './interfaces/print-job.interface';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getData() {
+  getData(): { message: string } {
     return this.appService.getData();
   }
 
   @Post('print-job')
-  async createPrintJob(@Body() printJobData: any) {
+  createPrintJob(@Body() printJobData: PrintJobData): PrintJob {
     if (!printJobData.printerId || !printJobData.documentId) {
       throw new ValidationException([
         {
@@ -36,7 +42,7 @@ export class AppController {
   }
 
   @Get('print-job/:id')
-  async getPrintJobStatus(@Param('id') id: string) {
+  getPrintJobStatus(@Param('id') id: string): PrintJobStatus {
     if (!id || id.length < 3) {
       throw new ValidationException([
         {
@@ -51,22 +57,22 @@ export class AppController {
   }
 
   @Get('printer/:id/status')
-  async getPrinterStatus(@Param('id') id: string) {
+  getPrinterStatus(@Param('id') id: string): PrinterInfo {
     return this.appService.getPrinterStatus(id);
   }
 
   @Post('queue/process')
-  async processQueue() {
+  processQueue(): { processed: number; remaining: number } {
     return this.appService.processQueue();
   }
 
   @Get('error/printer-connection')
-  testPrinterConnectionError() {
+  testPrinterConnectionError(): never {
     throw new ExternalServiceException('Falha na conexão com a impressora HP-001');
   }
 
   @Get('error/queue-full')
-  testQueueError() {
+  testQueueError(): never {
     throw new BusinessLogicException(
       'Fila de impressão está cheia. Aguarde processamento dos jobs pendentes.',
     );

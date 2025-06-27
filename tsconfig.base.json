@@ -13,7 +13,7 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    
+
     // Strict type checking options
     "strict": true,
     "noImplicitAny": true,
@@ -24,7 +24,7 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitOverride": true,
-    
+
     // Additional checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,

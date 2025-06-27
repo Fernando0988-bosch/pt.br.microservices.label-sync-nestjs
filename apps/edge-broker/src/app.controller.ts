@@ -10,12 +10,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getData() {
+  getData(): { message: string } {
     return this.appService.getData();
   }
 
   @Get('broker/:id')
-  async getBrokerData(@Param('id') id: string) {
+  getBrokerData(@Param('id') id: string): { id: string; status: string; service: string } {
     if (!id || id.length < 3) {
       throw new ValidationException([
         {
@@ -30,7 +30,7 @@ export class AppController {
   }
 
   @Get('error')
-  testError() {
+  testError(): never {
     throw new BusinessLogicException('Erro de teste do Edge Broker');
   }
 }

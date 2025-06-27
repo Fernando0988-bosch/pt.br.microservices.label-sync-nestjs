@@ -2,15 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { RabbitMQService } from './rabbitmq.service';
 import { PublisherService } from './publishers';
 import { ConsumerService } from './consumers';
-import { 
-  PublishOptions, 
-  ConsumeOptions, 
-  MessageHandler, 
+import {
+  PublishOptions,
+  ConsumeOptions,
+  MessageHandler,
   RetryPolicy,
   ExchangeConfig,
   QueueConfig,
   ConnectionStatus,
-  ConsumerStats
+  ConsumerStats,
 } from './interfaces';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class RabbitMQHelperService {
   constructor(
     private readonly rabbitMQService: RabbitMQService,
     private readonly publisherService: PublisherService,
-    private readonly consumerService: ConsumerService
+    private readonly consumerService: ConsumerService,
   ) {}
 
   async setupExchange(config: ExchangeConfig): Promise<void> {
@@ -37,30 +37,26 @@ export class RabbitMQHelperService {
     exchange: string,
     routingKey: string,
     data: T,
-    options?: Partial<PublishOptions>
+    options?: Partial<PublishOptions>,
   ): Promise<boolean> {
     const publishOptions: PublishOptions = {
       exchange,
       routingKey,
       persistent: true,
-      ...options
+      ...options,
     };
 
-    return this.publisherService.publish(data, publishOptions);
+    return await this.publisherService.publish(data, publishOptions);
   }
 
-  async publishToQueue<T>(
-    queueName: string,
-    data: T,
-    options?: Partial<PublishOptions>
-  ): Promise<boolean> {
-    return this.publisherService.publishToQueue(queueName, data, options);
+  async publishToQueue<T>(queueName: string, data: T, options?: Partial<PublishOptions>): Promise<boolean> {
+    return await this.publisherService.publishToQueue(queueName, data, options);
   }
 
   async startConsumer<T>(
     queue: string,
     handler: MessageHandler<T>,
-    options?: ConsumeOptions
+    options?: ConsumeOptions,
   ): Promise<string> {
     return this.consumerService.consume(queue, handler, options);
   }
@@ -68,24 +64,24 @@ export class RabbitMQHelperService {
   async startRetryableConsumer<T>(
     queue: string,
     handler: MessageHandler<T>,
-    maxRetries: number = 3,
-    initialDelay: number = 1000,
-    options?: ConsumeOptions
+    maxRetries = 3,
+    initialDelay = 1000,
+    options?: ConsumeOptions,
   ): Promise<string> {
     const retryPolicy: RetryPolicy = {
       maxRetries,
       initialDelay,
       backoffMultiplier: 2,
-      maxDelay: 30000
+      maxDelay: 30000,
     };
 
     return this.consumerService.consumeWithRetry(queue, handler, retryPolicy, options);
   }
 
-  async createWorkQueue(queueName: string, durable: boolean = true): Promise<void> {
+  async createWorkQueue(queueName: string, durable = true): Promise<void> {
     const queueConfig: QueueConfig = {
       name: queueName,
-      options: { durable }
+      options: { durable },
     };
 
     await this.setupQueue(queueConfig);
@@ -93,12 +89,12 @@ export class RabbitMQHelperService {
 
   async createTopicExchange(
     exchangeName: string,
-    queueConfigs: Array<{ queueName: string; routingKeys: string[] }>
+    queueConfigs: Array<{ queueName: string; routingKeys: string[] }>,
   ): Promise<void> {
     const exchangeConfig: ExchangeConfig = {
       name: exchangeName,
       type: 'topic',
-      options: { durable: true }
+      options: { durable: true },
     };
 
     await this.setupExchange(exchangeConfig);
@@ -107,24 +103,21 @@ export class RabbitMQHelperService {
       const queueConfig: QueueConfig = {
         name: queueName,
         options: { durable: true },
-        bindings: routingKeys.map(routingKey => ({
+        bindings: routingKeys.map((routingKey) => ({
           exchange: exchangeName,
-          routingKey
-        }))
+          routingKey,
+        })),
       };
 
       await this.setupQueue(queueConfig);
     }
   }
 
-  async createFanoutExchange(
-    exchangeName: string,
-    queueNames: string[]
-  ): Promise<void> {
+  async createFanoutExchange(exchangeName: string, queueNames: string[]): Promise<void> {
     const exchangeConfig: ExchangeConfig = {
       name: exchangeName,
       type: 'fanout',
-      options: { durable: true }
+      options: { durable: true },
     };
 
     await this.setupExchange(exchangeConfig);
@@ -133,28 +126,30 @@ export class RabbitMQHelperService {
       const queueConfig: QueueConfig = {
         name: queueName,
         options: { durable: true },
-        bindings: [{
-          exchange: exchangeName,
-          routingKey: ''
-        }]
+        bindings: [
+          {
+            exchange: exchangeName,
+            routingKey: '',
+          },
+        ],
       };
 
       await this.setupQueue(queueConfig);
     }
   }
 
-  async getConnectionHealth(): Promise<{
+  getConnectionHealth(): {
     isHealthy: boolean;
     connectionStatus: ConnectionStatus;
     consumerStats: ConsumerStats;
-  }> {
+  } {
     const connectionStatus = this.rabbitMQService.getConnectionStatus();
     const consumerStats = this.consumerService.getConsumerStats();
 
     return {
       isHealthy: connectionStatus.isConnected && consumerStats.totalErrors === 0,
       connectionStatus,
-      consumerStats
+      consumerStats,
     };
   }
 

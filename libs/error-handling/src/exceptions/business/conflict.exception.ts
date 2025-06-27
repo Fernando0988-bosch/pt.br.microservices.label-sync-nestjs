@@ -2,7 +2,7 @@ import { ErrorCode } from '../../constants';
 import { BaseException } from '../base';
 
 export class ConflictException extends BaseException {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super({
       errorCode: ErrorCode.CONFLICT,
       message,
@@ -12,7 +12,7 @@ export class ConflictException extends BaseException {
 }
 
 export class DuplicateEntryException extends BaseException {
-  constructor(entity: string, field: string, value: any) {
+  constructor(entity: string, field: string, value: unknown) {
     super({
       errorCode: ErrorCode.DUPLICATE_ENTRY,
       message: `${entity} com ${field} '${value}' já existe`,

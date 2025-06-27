@@ -10,12 +10,16 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getData() {
+  getData(): { message: string } {
     return this.appService.getData();
   }
 
   @Get('label-config/:id')
-  async getLabelConfig(@Param('id') id: string) {
+  getLabelConfig(@Param('id') id: string): {
+    id: string;
+    status: string;
+    config: { template: string; format: string };
+  } {
     if (!id || id.length < 3) {
       throw new ValidationException([
         {
@@ -30,12 +34,16 @@ export class AppController {
   }
 
   @Get('label-config-specific/:id')
-  async getLabelConfigSpecific(@Param('id') id: string) {
+  getLabelConfigSpecific(@Param('id') id: string): {
+    id: string;
+    status: string;
+    config: { template: string; format: string };
+  } {
     return this.appService.getLabelConfigWithSpecificError(id);
   }
 
   @Get('error')
-  testError() {
+  testError(): never {
     throw new BusinessLogicException('Erro de teste para demonstrar o tratamento de label config');
   }
 }

@@ -51,3 +51,9 @@ export interface ConnectionStatus {
   lastDisconnected?: Date;
   reconnectAttempts: number;
 }
+
+export interface RabbitMQConnection {
+  createChannel(): Promise<unknown>;
+  close(): Promise<void>;
+  on(event: string, callback: (error?: Error) => void): void;
+}

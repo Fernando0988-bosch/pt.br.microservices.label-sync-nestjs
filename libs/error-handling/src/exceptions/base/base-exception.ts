@@ -4,8 +4,8 @@ import { ExceptionMetadata } from '../../interfaces';
 
 export abstract class BaseException extends HttpException {
   public readonly errorCode: ErrorCode;
-  public readonly details?: any;
-  public readonly context?: any;
+  public readonly details?: unknown;
+  public readonly context?: Record<string, unknown>;
   public override readonly cause: Error | undefined;
   public readonly retryable: boolean;
   public readonly timestamp: string;
@@ -13,12 +13,12 @@ export abstract class BaseException extends HttpException {
 
   constructor(metadata: ExceptionMetadata) {
     const statusCode = HttpStatusByErrorCode[metadata.errorCode] ?? HttpStatus.BAD_GATEWAY;
-    const message = metadata.message || ErrorMessages[metadata.errorCode];
+    const message = metadata.message ?? ErrorMessages[metadata.errorCode];
 
     const response = {
       statusCode,
       errorCode: metadata.errorCode,
-      message: metadata.userMessage || message,
+      message: metadata.userMessage ?? message,
       details: metadata.details,
       timestamp: new Date().toISOString(),
     };
@@ -38,7 +38,7 @@ export abstract class BaseException extends HttpException {
     }
   }
 
-  toJSON() {
+  toJSON(): Record<string, unknown> {
     return {
       statusCode: this.getStatus(),
       errorCode: this.errorCode,
@@ -54,8 +54,8 @@ export abstract class BaseException extends HttpException {
     return this.retryable;
   }
 
-  withContext(context: Record<string, any>): this {
-    (this as any).context = { ...this.context, ...context };
+  withContext(context: Record<string, unknown>): this {
+    (this as { context?: Record<string, unknown> }).context = { ...this.context, ...context };
     return this;
   }
 }

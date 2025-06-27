@@ -3,7 +3,7 @@ import { BaseException } from '../base';
 import { ValidationError } from '../../interfaces';
 
 export class BadRequestException extends BaseException {
-  constructor(message?: string, details?: any) {
+  constructor(message?: string, details?: unknown) {
     super({
       errorCode: ErrorCode.BAD_REQUEST,
       message,
