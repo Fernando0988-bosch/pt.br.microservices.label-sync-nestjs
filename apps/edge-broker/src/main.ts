@@ -1,19 +1,38 @@
 /**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
+ * Edge Broker Microservice
+ * Responsible for managing edge connections and message brokering
  */
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { environment } from './environments/environment';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
-  Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+
+  // Configure global prefix
+  app.setGlobalPrefix(environment.globalPrefix);
+
+  // Enable CORS for development
+  if (!environment.production) {
+    app.enableCors();
+  }
+
+  // Start server
+  await app.listen(environment.port);
+
+  Logger.log(
+    `🚀 Edge Broker is running on: http://localhost:${environment.port}/${environment.globalPrefix}`,
+    'Bootstrap',
+  );
+  Logger.log(
+    `🌍 Environment: ${environment.production ? 'Production' : 'Development'}`,
+    'Bootstrap',
+  );
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  Logger.error('❌ Error starting application', error, 'Bootstrap');
+  process.exit(1);
+});
