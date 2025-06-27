@@ -51,9 +51,7 @@ export enum ErrorCode {
   INVALID_LABEL_FORMAT = 'INVALID_LABEL_FORMAT',
 }
 
-// NUNCA retorna 500 - sempre converte para outros códigos
 export const HttpStatusByErrorCode: Record<ErrorCode, number> = {
-  // 400 Bad Request
   [ErrorCode.BAD_REQUEST]: 400,
   [ErrorCode.VALIDATION_ERROR]: 400,
   [ErrorCode.INVALID_DATA_FORMAT]: 400,
@@ -96,7 +94,7 @@ export const HttpStatusByErrorCode: Record<ErrorCode, number> = {
   // 429 Too Many Requests
   [ErrorCode.TOO_MANY_REQUESTS]: 429,
 
-  // 502 Bad Gateway (ao invés de 500)
+  // 502 Bad Gateway
   [ErrorCode.EXTERNAL_SERVICE_ERROR]: 502,
   [ErrorCode.INTEGRATION_ERROR]: 502,
   [ErrorCode.SAP_CONNECTION_ERROR]: 502,

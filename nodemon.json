@@ -1,0 +1,9 @@
+{
+  "watch": ["apps/sap-catalog-poller/src", "libs"],
+  "ext": "ts",
+  "ignore": ["*.spec.ts", "*.test.ts"],
+  "exec": "tsx apps/sap-catalog-poller/src/main.ts",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

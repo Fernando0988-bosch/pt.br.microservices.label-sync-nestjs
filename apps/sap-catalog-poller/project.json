@@ -6,38 +6,38 @@
   "tags": ["scope:sap-catalog-poller", "type:app"],
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"]
-      },
-      "configurations": {
-        "development": {
-          "args": ["node-env=development"]
-        }
+        "outputPath": "dist/apps/sap-catalog-poller",
+        "main": "apps/sap-catalog-poller/src/main.ts",
+        "tsConfig": "apps/sap-catalog-poller/tsconfig.app.json",
+        "assets": []
       }
     },
     "serve": {
-      "continuous": true,
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
-      "dependsOn": ["build"],
       "options": {
         "buildTarget": "sap-catalog-poller:build",
-        "runBuildTargetDependencies": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "sap-catalog-poller:build:development"
-        },
-        "production": {
-          "buildTarget": "sap-catalog-poller:build:production"
-        }
+        "watch": true
       }
     },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
     "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
+        "jestConfig": "apps/sap-catalog-poller/jest.config.ts",
         "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverageReporters": ["text"]
+        }
       }
     }
   }
